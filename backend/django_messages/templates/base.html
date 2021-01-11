@@ -1,0 +1,20 @@
+{% extends 'layouts/default/page.html' %}
+
+{% load i18n %}
+
+
+{% block section %}
+    <div class="messages-section">
+        <div class="messages-sidebar">
+            {% block sidebar %}
+
+            {% endblock sidebar %}
+        </div>
+        <div class="messages-content">
+            {% block content %}
+
+            {% endblock content %}
+        </div>
+
+    </div>
+{% endblock section %}

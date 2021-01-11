@@ -1,0 +1,17 @@
+{% extends 'layouts/default/page.html' %}
+
+{% load i18n %}
+{% block section %}
+    {% block content %}
+        <div class="assets-heading">
+            {% if request.user.fullname %}
+                <h1> {{ request.user.fullname }}'s Assets</h1>
+            {% else %}
+                <h1> Your Assets</h1>
+            {% endif %}
+        </div>
+        {% include 'assets/assets_gallery.html' %}
+        {% include 'assets/asset_modal.html' %}
+    {% endblock %}
+
+{% endblock %}

@@ -1,0 +1,93 @@
+
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:100,300,400");
+@import "../node_modules/cropperjs/dist/cropper.min.css";
+@import "../node_modules/viewerjs/dist/viewer.min.css";
+@import url("https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css");
+@import url("https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css");
+
+
+@import "asset_modal.css";
+@import "asset_card.css";
+@import "add_asset.css";
+
+.center_div {
+    margin: 0 auto;
+    min-width: 60%;
+    max-width: 70%;
+}
+
+.container-fluid.no-padding {
+    padding: 0;
+}
+
+.messages-section {
+    display: grid;
+    grid-template-columns: 15% auto ;
+    margin: 10px;
+}
+
+.assets-heading {
+    text-align: center;
+}
+
+.catena-assets {
+    display: grid;
+    place-items: center;
+    text-align: center;
+    grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+    grid-template-rows: repeat(auto-fill, 1fr);
+    gap: 10px;
+}
+
+#modal-gallery {
+    list-style: none;
+}
+
+#modal-gallery > li {
+  border: 1px solid transparent;
+  float: left;
+  height: calc(100% / 3);
+  margin: 0 -1px -1px 0;
+  overflow: hidden;
+  width: calc(100% / 3);
+}
+
+.catena-assets-pagination {
+    display: grid;
+    place-items: center;
+
+}
+
+.catena-asset {
+    display: grid;
+    place-items: center;
+    text-align: center;
+}
+
+.input-group {
+    padding: 5px;
+}
+
+.main-wrapper {
+    display: grid;
+    grid-template-columns: 8% auto 10%;
+    grid-auto-rows: minmax(10px, auto);
+    grid-column-gap: 100px;
+}
+
+.main-options-column {
+
+
+}
+
+.main-content-column {
+    grid-column-gap: 10rem;
+
+
+}
+
+
+img {
+    max-width: 100%;
+    max-height: 100%;
+}

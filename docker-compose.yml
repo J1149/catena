@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+    db:
+      image: "postgres:12"
+      ports:
+        - "5431:${SQL_PORT}"
+      restart: always
+      environment:
+        POSTGRES_USER: ${SQL_USER}
+        POSTGRES_PASSWORD: ${SQL_PASS}
+        POSTGRES_DB: ${CATENA_DB_NAME}
+      networks:
+        - catenanet
+    catena_backend:
+      build:
+        context: ./
+        dockerfile: ./backend/Dockerfile
+      entrypoint: ./entrypoint.sh 
+      command: python manage.py runserver --noreload 0.0.0.0:7000
+      depends_on: 
+      - db
+    
+      ports:
+        - "${BACKEND_PORT}:7000"
+      environment:
+        SCHEME: ${SCHEME}
+
+        DATA_ROOT: ${DATA_ROOT}
+        DATA_DIR: ${BACKEND_DATA_DIR}
+
+        BACKEND_HOST: ${BACKEND_HOST}
+        BACKEND_PORT: ${BACKEND_PORT}
+
+        PAIPASS_HOST: ${PAIPASS_HOST}
+        PAIPASS_PORT: ${PAIPASS_PORT} 
+
+        PAIPASS_API_HOST: ${PAIPASS_API_HOST}
+        PAIPASS_API_PORT: ${PAIPASS_API_PORT}
+
+        CATENA_DJANGO_SECRET: ${CATENA_DJANGO_SECRET}
+
+        SQL_HOST: ${SQL_HOST}
+        SQL_PORT: ${SQL_PORT}
+        SQL_USER: ${SQL_USER}
+        SQL_PASS: ${SQL_PASS}
+
+        DEPLOYMENT_ENVIRONMENT: ${DEPLOYMENT_ENVIRONMENT}
+
+        DEV_EMAIL: ${PAIPASS_DEV_EMAIL}
+        DEV_PASS: ${PAIPASS_DEV_PASS}
+        DEV_APP_UUID: ${PAIPASS_DEV_APP_UUID}
+        DEV_PHONE: ${PAIPASS_DEV_PHONE}
+        CATENA_DB_NAME: ${CATENA_DB_NAME}
+
+
+
+        PAIPASS_SSO_CLIENT_ID: ${PAIPASS_SSO_CLIENT_ID}
+        PAIPASS_SSO_CLIENT_SECRET: ${PAIPASS_SSO_CLIENT_SECRET}
+        CATENA_SCHEMA_ASSET_UUID: ${CATENA_SCHEMA_ASSET_UUID}
+
+      networks:
+        - catenanet
+        - paipassnet
+
+networks:
+  catenanet:
+  paipassnet:
+          external: true

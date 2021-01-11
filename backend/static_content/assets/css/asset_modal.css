@@ -1,0 +1,23 @@
+.modal-footer {
+    justify-content: center;
+}
+
+.modal-body {
+    display: grid;
+    grid-template-columns: 40% 50%;
+    gap: 15px;
+}
+
+.modal-image {
+    grid-column: 1 / span 1;
+    grid-row: 1 / span 2;
+}
+
+.modal-body-text {
+    grid-column: 2 / span 1;
+    grid-row: 1 / span 2;
+}
+
+.modal-btn-delete {
+    background-color: #ff2c21;
+}

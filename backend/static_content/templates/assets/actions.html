@@ -1,0 +1,87 @@
+{% load static %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% get_current_language as language_code %}
+
+<!DOCTYPE html>
+<html lang="{{ language_code }}">
+<head>
+
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Catena Art Gallery.">
+    <meta name="author" content="Ryan Hernandez">
+
+    <link rel="icon" href="{% static 'favicon.ico' %}">
+
+    <title>Catena</title>
+
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+</head>
+
+<body>
+
+<nav class="navbar  navbar-light bg-dark fixed-bottom">
+
+    <a class="navbar-brand" href="/">{% trans 'Catena Art' %}</a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            {% if request.user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'assets:index' %}">{% trans 'Assets' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" >{% trans 'Messages' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:profile' %}">{% trans 'Profile' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:logout' %}">{% trans 'Log out' %}</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:login' %}" >{% trans 'Log in' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" >{% trans 'Create an account' %}</a>
+                </li>
+            {% endif %}
+        </ul>
+
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" >{% trans 'Change language' %}</a>
+            </li>
+        </ul>
+    </div>
+
+</nav>
+
+<div class="container-fluid mt-3">
+
+    {% bootstrap_messages %}
+
+    {% block content %}
+        No content.
+    {% endblock %}
+
+</div>
+
+<script src="{% static 'vendor/jquery/jquery-3.5.1.min.js' %}"></script>
+<script src="{% static 'vendor/popper/popper.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+
+<script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+{% extends 'layouts/default/page.html' %}
+
+{% load i18n %}
+
+{% block section %}
+    <div class="container center_div">
+        <form method="post" id="profile-form">
+            {% csrf_token %}
+            {% if user_profile.is_user_requesting_themself %}
+                <div class="form-group">
+                    <label for="formControlInput6">Account Type</label>
+                    <input type="email" class="form-control" id="formControlInput6"
+                           placeholder="{{ user_profile.account_type }}"
+                           readonly>
+                </div>
+                <div class="form-group">
+                    <label for="formControlInput1">Email address</label>
+                    <input type="email" class="form-control" id="formControlInput1"
+                           placeholder="{{ user_profile.email }}"
+                           readonly>
+                </div>
+                <div class="form-group">
+                    <label for="formControlInput2">Name</label>
+                    <input type="email" class="form-control" id="formControlInput2"
+                           placeholder="{{ user_profile.full_name }}" readonly>
+
+                </div>
+                <div class="form-group">
+                    <label for="formControlInput3">Phone Number</label>
+                    <input type="email" class="form-control" id="formControlInput3"
+                           placeholder="{{ user_profile.phone_number }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="formControlInput4">PAI Coin Public Key</label>
+                    <input type="email" class="form-control" id="formControlInput4"
+                           placeholder="{{ user_profile.public_key }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="formControlInput5">Description</label>
+                    <textarea name="description" class="form-control" id="formControlInput5"
+                              rows="3">{{ user_profile.description }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Save Description</button>
+                <button class="btn btn-primary refresh-user-data-button" type="button">Refresh Data</button>
+            {% else %}
+                <div class="form-group">
+                    <label for="formControlInput6">Account Type</label>
+                    <input type="email" class="form-control" id="formControlInput6"
+                           placeholder="{{ user_profile.account_type }}"
+                           readonly>
+                </div>
+                <div class="form-group">
+                    <label for="formControlInput4">PAI Coin Public Key</label>
+                    <input type="email" class="form-control" id="formControlInput4"
+                           placeholder="{{ user_profile.public_key }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="formControlInput5">Description</label>
+                    <textarea name="description" class="form-control" id="formControlInput5"
+                              rows="3">{{ user_profile.description }}</textarea>
+                </div>
+                <a type="button" class="btn btn-primary mb-2" href="{{ user_profile.dm_url }}">Send Message</a>
+            {% endif %}
+
+        </form>
+    </div>
+{% endblock %}

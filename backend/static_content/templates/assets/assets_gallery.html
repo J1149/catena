@@ -1,0 +1,65 @@
+<div class="main-wrapper">
+
+    <div class="main-options-column">
+
+    </div>
+
+    <div class="main-content-column">
+        <div class="catena-assets">
+            {% if not is_home_page %}
+                <div class="card card-add">
+                    <!-- <h5 class="card-title">Add Asset</h5>
+                    <p class="card-text">Click the button below to start the process of adding a new asset.</p> -->
+                    <a href="{% url 'assets:add_asset' %}">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                </div>
+            {% endif %}
+            {% for catena_asset in catena_assets %}
+                <div class="card">
+                    <div class="card-inner-wrapper">
+
+                        {% if catena_asset.images|length > 0 %}
+                            <img class="card-img"
+                                 src="{% url 'assets:image' image_id=catena_asset.main_thumbnail %}">
+
+                        {% else %}
+                            <img class="card-img"
+                                 src="https://test-s3-id-verifications.s3.amazonaws.com/development/yggdrasil/24b73b1c-7784-46c5-8347-362bb78e7748/Isleworthml.JPG">
+                        {% endif %}
+
+                        <div class="card-body">
+                            <a class="stretched-link" data-toggle="modal" href="#" data-target="#assetModal"
+                               data-asset-id="{{ catena_asset.asset_id }}"
+                               data-asset-name="{{ catena_asset.name }}"
+                               data-asset-artist="{{ catena_asset.artist }}"
+                               data-asset-owner="{{ catena_asset.asset_owner }}"
+                               data-asset-description="{{ catena_asset.description }}"
+                               data-asset-price="{{ catena_asset.price }}"
+                               data-asset-images="{{ catena_asset.images }}"
+                               data-primary-image="{{ catena_asset.images.0 }}"
+                               data-owner-dm-url="{{ catena_asset.dm_url }}"
+                               data-owner-profile-url="{{ catena_asset.profile_url }}"
+                            >
+
+                                <h5 class="card-title">{{ catena_asset.name|truncatechars:21 }}</h5>
+                                <p class="card-text">{{ catena_asset.description|truncatechars:100 }}</p>
+
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+        <div class="catena-assets-pagination">
+            <div class="btn-group mr-2" role="group" aria-label="First group">
+                <a type="button" href="{{ prev }}" class="btn btn-primary {{ prev_disabled }}">prev</a>
+                <span/>
+                <a type="button" href="{{ next }}" class="btn btn-primary {{ next_disabled }}">next</a>
+            </div>
+        </div>
+    </div>
+</div>
+
