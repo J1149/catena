@@ -12,6 +12,7 @@ import json
 from urllib.parse import urlencode
 from django.http import FileResponse, StreamingHttpResponse, HttpResponse
 from dataclasses import dataclass, field
+from datetime import datetime
 from PIL import Image
 from users.users import get_signup_url
 from users.models import CatenaUser
@@ -27,13 +28,14 @@ def append_field(d, name, value, type_, value_actual=None, ):
         d['value_actual'] = value_actual
 
 
-def append_fields(tree, post, field_names):
-    type_ = 'TEXT'
+def append_fields(tree, post, field_names, field_type=None):
+    if field_type is None:
+        field_type = 'TEXT'
     for count, field_name in enumerate(field_names, start=tree['count'] + 1):
         field_internal_name = f'field{count}'
         tree[field_internal_name] = {}
 
-        append_field(tree[field_internal_name], field_name, post[field_name], type_)
+        append_field(tree[field_internal_name], field_name, post[field_name], field_type)
         tree['count'] += 1
 
 
@@ -129,6 +131,11 @@ def to_thumbnail(img):
     return ContentFile(b.getvalue(), name=img.name)
 
 
+# if the user does not input a public key address,
+# paipass will generate one internally from its own wallet
+DEFAULT_PUB_KEY_ADDR = 'via_paipass'
+
+
 def construct_tree(request, substitute_ids_from=None, has_images=False):
     schema_uuid = settings.CATENA_SCHEMA_ASSET_UUID
     tree = {}
@@ -140,14 +147,68 @@ def construct_tree(request, substitute_ids_from=None, has_images=False):
                     'Asset Owner': request.user.email}
     derived_tree.update(request.POST.dict())
 
-    if derived_tree['Public'].lower() == 'on':
-        tree['shared_with'] = 'everyone'
+    asset_pub_key_addr = derived_tree.get('Asset Public Key Address', DEFAULT_PUB_KEY_ADDR)
+    asset_pub_key = derived_tree.get('Asset Public Key', None)
+    if asset_pub_key is None:
+        encryption_value = 'unencrypted'
     else:
-        tree['shared_with'] = 'self'
+        encryption_value = 'encrypted'
+
+    # this part of the config is built to imitate Pdp2Cfg in pdp2.py in paipass
+    tree['cfg'] = {'name': 'paipass',
+                   # the possible ops are found with the definition
+                   # of Pdp2Op in pdp2.py in paipass
+                   # 'op': 'OP_STORE',
+                   'op': 'OP_SEND',
+                   'pub_key_addr': asset_pub_key_addr,
+                   'pub_key': asset_pub_key,
+                   'amount': 0.00013,
+                   'is_pub_key_ours': asset_pub_key_addr == DEFAULT_PUB_KEY_ADDR,
+                   'encryption_value': encryption_value,
+                   # maybe this should depend on whether there are files
+                   # attached
+                   'is_compressed': False,
+                   'watched_by': {
+                       'name': 'PDP2'
+                   }}
+
+    # apparently if the box is not checked, a key named Public will not be in the
+    # tree
+    if 'Public' in derived_tree and derived_tree['Public'].lower() == 'on':
+        tree['cfg']['shared_with'] = 'everyone'
+    else:
+        tree['cfg']['shared_with'] = 'self'
+
+    # TODO This wasn't in the forms initially; delete this once it's added to the forms
+    if 'Price Units' not in derived_tree:
+        derived_tree['Price Units'] = 'USD'
 
     append_fields(tree, derived_tree,
-                  ['Name', 'Asset Owner', 'Asset Poster', 'Price', 'Description', 'Artist'])
+                  ['Name', 'Asset Owner', 'Asset Poster', 'Price', 'Price Units',
+                   'Description', 'Artist'])
 
+    subtree = {}
+    tree['count'] += 1
+    tree[f"field{tree['count']}"] = subtree
+    subtree['fieldType'] = 'LIST'
+    subtree['name'] = 'Timeline Events'
+    subtree['count'] = 0
+
+    subsubtree = {}
+    subtree['count'] += 1
+    subtree[f"field{subtree['count']}"] = subsubtree
+    subsubtree['fieldType'] = 'OBJECT'
+    subsubtree['name'] = 'Timeline Event'
+    subsubtree['count'] = 0
+
+    derived_tree['Blockchain Address'] = 'VIA_PAIPASS'
+    derived_tree['Timestamp'] = datetime.utcnow().isoformat()
+    derived_tree['Event Name'] = derived_tree.get('Change Description', 'Initial Submission')
+    append_fields(subsubtree, derived_tree,
+                  ['Event Name', 'Blockchain Address', ])
+    append_fields(subsubtree, derived_tree, ('Timestamp',), field_type='DATE')
+    subtree['count'] += 1
+    subsubtree['count'] += 1
     out_files = None
     if has_images:
         subtree = {}
@@ -165,7 +226,7 @@ def construct_tree(request, substitute_ids_from=None, has_images=False):
 
         tree['count'] += 1
     if substitute_ids_from is not None:
-        for key, obj in iter_obj(tree, None):
+        for (key, obj) in iter_obj(tree, None):
             if key in substitute_ids_from:
                 obj['data_id'] = substitute_ids_from.get_field(key).data_id
     return tree, out_files
@@ -258,10 +319,12 @@ class CatenaAsset:
     artist: str = None
     description: str = None
     price: str = None
-    price_units: str = None
+    price_units: str = "USD"
     dm_url: str = None
     profile_url: str = None
     shared_with: str = None
+    txid: str = 'Not Found'
+    txid_url: str = None
     timeline_events: list = field(default_factory=list)
     images: list = field(default_factory=list)
 
@@ -284,7 +347,7 @@ class CatenaAssetRawish:
         self.generate_fields(d)
 
     def generate_fields(self, d):
-        for key, obj in iter_obj(d, None):
+        for (key, obj) in iter_obj(d, None):
             if obj['fieldType'].upper() == 'LIST' or obj['fieldType'].upper() == 'OBJECT':
                 continue
             if obj['data_id'] is None:
@@ -307,8 +370,10 @@ class CatenaAssetRawish:
     def get_field(self, item):
         return self._names_to_assets[item]
 
+
 def normalize_name(name):
     return name.strip().replace(' ', '_').lower()
+
 
 def normalize_value(name, value):
     # if it's an email address, change it to the public key address
@@ -319,36 +384,53 @@ def normalize_value(name, value):
     return value
 
 
+def yield_pair(name, obj, key_name, image_key_name):
+    if key_name in obj:
+        if name.lower() == 'main_thumbnail':
+            return name, obj[image_key_name]
+        else:
+            return name, obj[key_name]
+    else:
+        return name, obj
+
 def iter_obj(assets_obj, key_name, image_key_name=None):
     if image_key_name is None:
         image_key_name = key_name
     for key, obj in assets_obj.items():
         if 'field' in key and key != 'fieldType':
-            #field_type = assets_obj['fieldType']
+            # field_type = assets_obj['fieldType']
             name = normalize_name(obj['name'])
-            if key_name in obj:
-                if name.lower() == 'main_thumbnail':
-                    yield name, obj[image_key_name]
-                else:
-                    yield name, obj[key_name]
+
+            if obj['fieldType'].upper() == 'OBJECT' or obj['fieldType'].upper() == 'LIST':
+                yield yield_pair(name, obj, key_name, image_key_name)
+                for (subkey, subobj) in iter_obj(obj, key_name, image_key_name):
+                    yield (subkey, subobj)
             else:
+                name, obj = yield_pair(name, obj, key_name, image_key_name)
                 yield name, obj
 
 
 def transform(data):
     catena_assets = []
+    # just a number that fits the txid into the modal
+    txid_truncation_len = 31
     for asset_id, catena_assets_set in data.items():
         catena_asset = CatenaAsset()
         catena_asset.asset_id = asset_id
-        for name, value in iter_obj(catena_assets_set, key_name='value', image_key_name='data_id'):
+        for (name, value) in iter_obj(catena_assets_set, key_name='value', image_key_name='data_id'):
 
-            value = normalize_value(name,value)
+
+            value = normalize_value(name, value)
             if name == 'images':
-                for _, image_id in iter_obj(value, key_name='data_id'):
+                for (_, image_id) in iter_obj(value, key_name='data_id'):
                     catena_asset.images.append(image_id)
             else:
                 setattr(catena_asset, normalize_name(name), value)
         setattr(catena_asset, 'shared_with', catena_assets_set['shared_with'])
+        if catena_assets_set['txid'] is not None:
+
+            setattr(catena_asset, 'txid', catena_assets_set['txid'][:txid_truncation_len] + '...')
+            setattr(catena_asset, 'txid_url', f"https://paichain.info/ui/tx/{catena_assets_set['txid']}")
         catena_assets.append(catena_asset)
     return catena_assets
 
@@ -427,8 +509,10 @@ def add_gallery_context_data(context, request, query_params=None):
             dataset.asset_owner = 'self'
         else:
             dataset.dm_url = reverse('messages_compose_to', kwargs={'recipient': dataset.asset_owner})
-
-        dataset.profile_url = reverse('users:profile', kwargs={'pub_key_addr': dataset.asset_owner})
+        if dataset.asset_owner == 'self':
+            dataset.profile_url = reverse('users:profile')
+        else:
+            dataset.profile_url = reverse('users:profile', kwargs={'pub_key_addr': dataset.asset_owner})
 
     context['catena_assets'] = data_bundle
     context['PAIPASS_API_DOMAIN'] = settings.PAIPASS_API_DOMAIN

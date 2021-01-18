@@ -133,7 +133,7 @@ if is_in_cloud(DEPLOYMENT_ENV.lower()):
 else:
     DEBUG = True
 
-
+DEBUG = True
 
 # Application definition
 

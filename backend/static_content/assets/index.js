@@ -45,6 +45,8 @@ $('#assetModal').on('show.bs.modal', function (event) {
     const primaryImage = button.data('primary-image')
     const assetOwnerDmUrl = button.data('owner-dm-url')
     const assetOwnerProfileUrl = button.data('owner-profile-url')
+    const assetTxid = button.data('asset-txid')
+    const assetTxidUrl = button.data('asset-txid-url')
     const modal = $(this)
     modal.find('.modal-title').text(modalTitle)
 
@@ -65,7 +67,13 @@ $('#assetModal').on('show.bs.modal', function (event) {
     modal.find('#assetPrice').text(`\$${price}`)
     modal.find('.modal-body #assetUserProfileUrl').text(assetOwner)
     modal.find('.modal-body #assetUserProfileUrl').attr('href', assetOwnerProfileUrl)
-
+    modal.find('.modal-body #assetTxid').text(assetTxid)
+    if (assetTxidUrl != null){
+        modal.find('.modal-body #assetTxid').attr('href', assetTxidUrl)
+    }
+    console.log(assetTxid)
+    console.log(assetTxidUrl)
+    console.log(modal.find('.modal-body #assetTxid'))
     modal.find('.modal-footer #sendMessageButton').attr('href', assetOwnerDmUrl)
     const buttonsDiv = modal.find('#asset-modal-buttons');
 
@@ -80,6 +88,8 @@ $('#assetModal').on('show.bs.modal', function (event) {
     } else {
         buttonsDiv.append(`<a id="sendMessageButton" type="button" class="btn btn-secondary">Send message</a>`)
     }
+
+
 })
 $('#assetModal').on('hidden.bs.modal', function (e) {
     if (e.target.id === 'assetModal') {
