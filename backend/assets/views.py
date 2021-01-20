@@ -147,7 +147,7 @@ def construct_tree(request, substitute_ids_from=None, has_images=False):
                     'Asset Owner': request.user.email}
     derived_tree.update(request.POST.dict())
 
-    asset_pub_key_addr = derived_tree.get('Asset Public Key Address', DEFAULT_PUB_KEY_ADDR)
+    asset_pub_key_addr = derived_tree.get('Asset Public Key Address', request.user.public_key)
     asset_pub_key = derived_tree.get('Asset Public Key', None)
     if asset_pub_key is None:
         encryption_value = 'unencrypted'
@@ -352,8 +352,6 @@ class CatenaAssetRawish:
                 continue
             if obj['data_id'] is None:
                 continue
-            print('name', obj['name'])
-            print(obj, flush=True)
             car = CatenaAssetRawishField(name=obj['name'], value=obj['value'], data_id=obj['data_id'])
             self.append_field(car)
 
