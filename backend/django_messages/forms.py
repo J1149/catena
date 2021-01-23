@@ -18,7 +18,7 @@ class ComposeForm(forms.Form):
     recipient = CommaSeparatedUserField(label=_(u"Recipient"))
     subject = forms.CharField(label=_(u"Subject"), max_length=140)
     body = forms.CharField(label=_(u"Body"),
-        widget=forms.Textarea(attrs={'rows': '12', 'cols':'55'}))
+        widget=forms.Textarea(attrs={'rows': '12', 'cols':'25'}))
 
 
     def __init__(self, *args, **kwargs):

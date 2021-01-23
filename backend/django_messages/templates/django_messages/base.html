@@ -1,12 +1,22 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block sidebar %}
-<ul class="subnavilist">
-    <li><a href="{% url 'messages_inbox' %} ">&raquo;&nbsp;{% trans "Inbox" %}</a></li>
-    <li><a href="{% url 'messages_outbox' %} ">&raquo;&nbsp;{% trans "Sent Messages" %}</a></li>
-    <li><a href="{% url 'messages_compose' %} ">&raquo;&nbsp;{% trans "New Message" %}</a></li>
-    <li><a href="{% url 'messages_trash' %} ">&raquo;&nbsp;{% trans "Trash" %}</a></li>
-</ul>
+    <ul class="nav justify-content-center">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'messages_compose' %}">{% trans "Compose" %}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'messages_inbox' %}">{% trans "Inbox" %}</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'messages_outbox' %}">{% trans "Sent" %}</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'messages_trash' %}" tabindex="-1">{% trans "Trash" %}</a>
+        </li>
+    </ul>
 {% endblock %}
 
 {% block subcontent %}

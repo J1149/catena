@@ -67,15 +67,20 @@ $('#assetModal').on('show.bs.modal', function (event) {
     modal.find('#assetPrice').text(`\$${price}`)
     modal.find('.modal-body #assetUserProfileUrl').text(assetOwner)
     modal.find('.modal-body #assetUserProfileUrl').attr('href', assetOwnerProfileUrl)
-    modal.find('.modal-body #assetTxid').text(assetTxid)
-    if (assetTxidUrl != null){
-        modal.find('.modal-body #assetTxid').attr('href', assetTxidUrl)
-    }
-    console.log(assetTxid)
-    console.log(assetTxidUrl)
-    console.log(modal.find('.modal-body #assetTxid'))
-    modal.find('.modal-footer #sendMessageButton').attr('href', assetOwnerDmUrl)
+
+
     const buttonsDiv = modal.find('#asset-modal-buttons');
+
+    const transactionIdDiv = modal.find('#transactionIdDiv')
+    transactionIdDiv.append(`<p>Transaction ID:</p>`);
+    if (assetTxid === 'Transaction Id Not Found'){
+
+        transactionIdDiv.append(`<i id="assetTxid">${assetTxid}</i>`)
+    } else {
+        transactionIdDiv.append(`<a target=_blank id="assetTxid" href="${assetTxidUrl}">${assetTxid}</a>`)
+    }
+
+    //modal.find('.modal-body #assetTxid').text(assetTxid)
 
     buttonsDiv.append(`<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>`)
     if (assetOwner === 'self') {
@@ -87,6 +92,8 @@ $('#assetModal').on('show.bs.modal', function (event) {
         modal.find('#editAssetButton').click(onEditAsset(assetId))
     } else {
         buttonsDiv.append(`<a id="sendMessageButton" type="button" class="btn btn-secondary">Send message</a>`)
+        modal.find('.modal-footer #sendMessageButton').attr('href', assetOwnerDmUrl)
+
     }
 
 
@@ -97,6 +104,8 @@ $('#assetModal').on('hidden.bs.modal', function (e) {
         const modal = $(this)
         modal.find('.modal-body #modal-gallery').html("")
         modal.find('#asset-modal-buttons').html("")
+        modal.find('#transactionIdDiv').html("")
+
     }
 })
 

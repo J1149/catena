@@ -20,7 +20,7 @@
                     <div class="card-inner-wrapper">
 
                         {% if catena_asset.images|length > 0 %}
-                            <img class="card-img"
+                            <img class="card-img img-fluid"
                                  src="{% url 'assets:image' image_id=catena_asset.main_thumbnail %}">
 
                         {% else %}

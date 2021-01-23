@@ -163,7 +163,7 @@ def construct_tree(request, substitute_ids_from=None, has_images=False):
                    'pub_key_addr': asset_pub_key_addr,
                    'pub_key': asset_pub_key,
                    'amount': 0.00013,
-                   'is_pub_key_ours': asset_pub_key_addr == DEFAULT_PUB_KEY_ADDR,
+                   'is_pub_key_ours': asset_pub_key_addr == DEFAULT_PUB_KEY_ADDR or asset_pub_key_addr == request.user.public_key,
                    'encryption_value': encryption_value,
                    # maybe this should depend on whether there are files
                    # attached
@@ -201,7 +201,7 @@ def construct_tree(request, substitute_ids_from=None, has_images=False):
     subsubtree['name'] = 'Timeline Event'
     subsubtree['count'] = 0
 
-    derived_tree['Blockchain Address'] = 'VIA_PAIPASS'
+    derived_tree['Blockchain Address'] = asset_pub_key_addr
     derived_tree['Timestamp'] = datetime.utcnow().isoformat()
     derived_tree['Event Name'] = derived_tree.get('Change Description', 'Initial Submission')
     append_fields(subsubtree, derived_tree,
@@ -310,6 +310,9 @@ class TimelineEvent:
     blockchain_address: str
 
 
+TXID_NOT_FOUND = 'Transaction Id Not Found'
+
+
 @dataclass
 class CatenaAsset:
     asset_id: str = None
@@ -323,7 +326,7 @@ class CatenaAsset:
     dm_url: str = None
     profile_url: str = None
     shared_with: str = None
-    txid: str = 'Not Found'
+    txid: str = TXID_NOT_FOUND
     txid_url: str = None
     timeline_events: list = field(default_factory=list)
     images: list = field(default_factory=list)
@@ -391,6 +394,7 @@ def yield_pair(name, obj, key_name, image_key_name):
     else:
         return name, obj
 
+
 def iter_obj(assets_obj, key_name, image_key_name=None):
     if image_key_name is None:
         image_key_name = key_name
@@ -417,7 +421,6 @@ def transform(data):
         catena_asset.asset_id = asset_id
         for (name, value) in iter_obj(catena_assets_set, key_name='value', image_key_name='data_id'):
 
-
             value = normalize_value(name, value)
             if name == 'images':
                 for (_, image_id) in iter_obj(value, key_name='data_id'):
@@ -426,7 +429,6 @@ def transform(data):
                 setattr(catena_asset, normalize_name(name), value)
         setattr(catena_asset, 'shared_with', catena_assets_set['shared_with'])
         if catena_assets_set['txid'] is not None:
-
             setattr(catena_asset, 'txid', catena_assets_set['txid'][:txid_truncation_len] + '...')
             setattr(catena_asset, 'txid_url', f"https://paichain.info/ui/tx/{catena_assets_set['txid']}")
         catena_assets.append(catena_asset)
