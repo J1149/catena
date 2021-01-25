@@ -2,25 +2,25 @@
 {% load i18n %}
 
 {% block content %}
-<h1>{% trans "View Message" %}</h1>
-<dl class="message-headers">
-    <dt>{% trans "Subject" %}</dt>
-    <dd><strong>{{ message.subject }}</strong></dd>
-    <dt>{% trans "Sender" %}</dt>
-    <dd>{{ message.sender }}</dd>
-    <dt>{% trans "Date" %} </dt>
-    <dd>{{ message.sent_at|date:_("DATETIME_FORMAT")}}</dd>
-    <dt>{% trans "Recipient" %}</dt>
-    <dd>{{ message.recipient }}</dd>
-</dl>
-{{ message.body|linebreaksbr }}<br /><br />
+    <h1>{{ message.subject }}</h1>
+    <dl class="row message-headers">
 
-{% ifequal message.recipient.pk user.pk %}
-<a href="{% url 'messages_reply' message.id %}">{% trans "Reply" %}</a>
-{% endifequal %}
-<a href="{% url 'messages_delete' message.id %}">{% trans "Delete" %}</a>
+        <dt class="col-sm-3">{% trans "Sender" %}</dt>
+        <dd class="col-sm-9">{{ message.sender }}</dd>
+        <dt class="col-sm-3">{% trans "Date" %} </dt>
+        <dd class="col-sm-9">{{ message.sent_at|date:_("DATETIME_FORMAT") }}</dd>
+        <dt class="col-sm-3">{% trans "Recipient" %}</dt>
+        <dd class="col-sm-9">{{ message.recipient }}</dd>
+    </dl>
 
-{% comment %}Example reply_form integration
+    <p class="mb-0">{{ message.body|linebreaksbr }} </p>
+
+    {% ifequal message.recipient.pk user.pk %}
+        <a href="{% url 'messages_reply' message.id %}">{% trans "Reply" %}</a>
+    {% endifequal %}
+    <a href="{% url 'messages_delete' message.id %}">{% trans "Delete" %}</a>
+
+    {% comment %}Example reply_form integration
 {% if reply_form %}
 <h1>{% trans "Compose reply"%}</h1>
 <form action="{% url 'messages_reply' message.id %}" method="post">

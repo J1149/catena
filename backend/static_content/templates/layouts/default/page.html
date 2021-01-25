@@ -74,13 +74,14 @@
 
 </nav>
 
-<div class="container-fluid mt-3">
+<div class="container mt-3">
 
     {% bootstrap_messages %}
-
-    {% block section %}
-        No content.
-    {% endblock %}
+    <div class="main-page-wrapper">
+        {% block section %}
+            No content.
+        {% endblock %}
+    </div>
 
 </div>
 <script type="text/javascript" src="{% static 'dist/main.js' %}"></script>

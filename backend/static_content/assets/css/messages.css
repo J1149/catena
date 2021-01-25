@@ -1,0 +1,30 @@
+.messages-section {
+    display: grid;
+    grid-template-rows: 15% auto;
+    margin: 10px;
+}
+
+.row-message-sender {
+}
+
+.row-message-subject {
+}
+
+.row-message-sent-date {
+    width: 40%
+}
+
+table.messages {
+    table-layout: fixed;
+}
+
+table.messages td, th {
+
+}
+
+.message-row-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 5px;
+}
