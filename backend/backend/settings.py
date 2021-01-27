@@ -133,7 +133,6 @@ if is_in_cloud(DEPLOYMENT_ENV.lower()):
 else:
     DEBUG = True
 
-DEBUG = True
 
 # Application definition
 
@@ -304,6 +303,4 @@ CATENA_SCHEMA_ASSET_UUID = os.environ['CATENA_SCHEMA_ASSET_UUID']
 
 PAIPASS_DEV_EMAIL = os.environ['DEV_EMAIL']
 PAIPASS_DEV_PASS = os.environ['DEV_PASS']
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-STATIC_URL = '/static/'
+

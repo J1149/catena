@@ -1,7 +1,10 @@
+@import url("https://use.fontawesome.com/releases/v5.8.2/css/all.css");
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:100,300,400");
 @import "../node_modules/cropperjs/dist/cropper.min.css";
 @import "../node_modules/viewerjs/dist/viewer.min.css";
 @import url("https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css");
+@import url("https://cdn.jsdelivr.net/npm/bs-stepper/dist/css/bs-stepper.min.css");
 @import url("https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css");
 
 @import "asset_modal.css";
