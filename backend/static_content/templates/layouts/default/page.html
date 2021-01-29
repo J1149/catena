@@ -15,9 +15,6 @@
 
 {#    <link rel="icon" href="{% static 'favicon.ico' %}">#}
     <link type="text/css" href="{% static 'css/styles.css' %}" rel="stylesheet">
-    <link href="{% static 'css/add_asset.css' %}" rel="stylesheet">
-
-
     <title>Catena</title>
 </head>
 
@@ -70,7 +67,8 @@
     {% bootstrap_messages %}
     <div class="main-page-wrapper">
         {% block section %}
-            No content.
+            No content.<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
         {% endblock %}
     </div>
 

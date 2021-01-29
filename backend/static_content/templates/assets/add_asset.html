@@ -4,7 +4,6 @@
 
 {% block content %}
     <div class="add-asset-container">
-        <div></div>
         <div id="stepper1" class="bs-stepper linear">
             <div class="bs-stepper-header" role="tablist">
                 <div class="step active" data-target="#step-l-1">
@@ -34,61 +33,96 @@
                     <div id="step-l-1" class="bs-stepper-pane active dstepper-block" role="tabpanel"
                          aria-labelledby="stepper1trigger1">
 
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Asset Name</span>
-                            </div>
+                        <div class="form-row">
+                            <label class="add-asset-label" for="formControlInput0">
+                                Asset Name &nbsp;
+                                <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                                   title="The name of the artwork.">
+                                    <i class="fa fa-question-circle"></i>
+                                </a>
+                            </label>
+
+
                             <input type="text" name="Name" class="form-control" id="formControlInput0"
                                    placeholder="Mona Lisa" required="">
                         </div>
 
-{#                        <div class="input-group">#}
-{#                            <div class="input-group-prepend">#}
-{#                                <span class="input-group-text">Owner</span>#}
-{#                            </div>#}
-{#                            <input type="email" name="Asset Owner" class="form-control" id="formControlInput1"#}
-{#                                   placeholder="name@example.com" required="">#}
-{#                        </div>#}
+                        <div class="form-row">
 
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Artist</span>
-                            </div>
+                            <label class="add-asset-label" for="formControlInput2">
+                                Artist &nbsp;
+                                <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                                   title="The name of artist who created the artwork.">
+                                    <i class="fa fa-question-circle"></i>
+                                </a>
+                            </label>
                             <input type="text" name="Artist" class="form-control" id="formControlInput2"
                                    placeholder="Leonardo da Vinci" required="">
                         </div>
 
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Price</span>
-                            </div>
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">$</span>
-                            </div>
+                        <div class="form-row">
 
-                            <input id="input_price" type="text" name="Price" class="form-control"
-                                   aria-label="Amount (to the nearest dollar)">
-                            <div class="input-group-append">
-                                <span class="input-group-text">.00</span>
+                            <label class="add-asset-label">
+                                Price &nbsp;
+                                <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                                   title="The price of the artwork.">
+                                    <i class="fa fa-question-circle"></i>
+                                </a>
+
+                            </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">$</span>
+                                </div>
+
+                                <input id="input_price" type="text" name="Price" class="form-control"
+                                       aria-label="Amount (to the nearest dollar)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">.00</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Description</span>
-                            </div>
+                        <div class="form-row">
+
+                            <label class="add-asset-label">
+                                Description &nbsp;
+                                <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                                   title="The description of the artwork.">
+                                    <i class="fa fa-question-circle"></i>
+                                </a>
+                            </label>
                             <textarea type="text" name="Description" class="form-control" id="formControlTextarea1"
                                       rows="3"></textarea>
                         </div>
 
-                        <div class="input-group">
+                        <div class="form-row">
+                            <label class="add-asset-label">
+                                Images &nbsp;
+                                <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                                   title="Images of the artwork.">
+                                    <i class="fa fa-question-circle"></i>
+                                </a>
+
+                            </label>
                             <input type="file" name="Images" class="form-control-file" id="assetImgUploads" multiple>
                         </div>
-
-                        <label class="switch">
-                            <span class="slider round">Publicly Viewable?</span>
-                            <input type="checkbox" name="Public" checked data-toggle="toggle">
-                        </label>
+                        <div class="form-row">
+                            <div class="checkbox" id="publiclyViewableCheckboxDiv">
+                                <label class="add-asset-label">
+                                    Privacy
+                                    <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                                       title="This determines whether people other than you can view the artwork.">
+                                        <i class="fa fa-question-circle"></i>
+                                    </a>
+                                </label>
+                                <label>
+                                    <input id="publiclyViewableCheckbox" type="checkbox" checked name="Public"
+                                           data-on="Public" data-off="Private"
+                                           data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+                                </label>
+                            </div>
+                        </div>
                         <div class="add-asset-stepper-button-container">
                             <button class="btn btn-primary add-asset-prev-btn" type="button" disabled>Prev</button>
                             <button class="btn btn-primary add-asset-nxt-btn btn-next-form" type="button">Next</button>
@@ -111,7 +145,6 @@
                 </form>
             </div>
         </div>
-        <div></div>
     </div>
 
 {% endblock %}

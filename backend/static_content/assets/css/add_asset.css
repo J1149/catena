@@ -1,8 +1,6 @@
 
-
 .add-asset-container {
     display: grid;
-    grid-template-columns: auto 70% auto;
 }
 
 
@@ -12,6 +10,31 @@
     justify-content: center;
 }
 
-#add-asset-image-previews{
+#add-asset-image-previews {
     display: grid;
+}
+
+.toggle-handle.btn-default {
+    /* mdb overrides this with their "!important" so we override
+     their override*/
+    background-color: #f8f8ff !important;
+
+}
+
+.checkbox label .toggle {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.add-asset-label {
+    margin-left: 1%;
+    margin-top: 2%;
+}
+
+.toggle-handle.btn-default {
+    border-width: 0 1px;
+}
+
+ #publiclyViewableCheckboxDiv .btn{
+    border: 2px solid transparent;
 }

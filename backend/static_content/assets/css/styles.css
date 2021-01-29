@@ -12,6 +12,10 @@
 @import "add_asset.css";
 @import "messages.css";
 
+.catena-tooltip {
+    color: #A9A9A9;
+}
+
 .center_div {
     margin: 0 auto;
     min-width: 60%;

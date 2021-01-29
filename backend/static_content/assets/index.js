@@ -7,7 +7,7 @@ import Stepper from 'bs-stepper'
 import Cropper from 'cropperjs';
 import Viewer from 'viewerjs';
 import Cookies from 'js-cookie';
-
+import 'bootstrap-toggle';
 var cropper = null;
 var viewer = null;
 
@@ -15,7 +15,7 @@ var viewer = null;
 function onDeleteAsset(assetId) {
     let csrftoken = Cookies.get('csrftoken');
 
-    return ()=> fetch(`/assets/${assetId}/`, {
+    return () => fetch(`/assets/${assetId}/`, {
         credentials: 'include',
         cache: 'no-cache',
         redirect: 'follow',
@@ -73,7 +73,7 @@ $('#assetModal').on('show.bs.modal', function (event) {
 
     const transactionIdDiv = modal.find('#transactionIdDiv')
     transactionIdDiv.append(`<p>Transaction ID:</p>`);
-    if (assetTxid === 'Transaction Id Not Found'){
+    if (assetTxid === 'Transaction Id Not Found') {
 
         transactionIdDiv.append(`<i id="assetTxid">${assetTxid}</i>`)
     } else {
@@ -177,6 +177,10 @@ const addAssetForm = document.getElementById('add-asset-form')
 
 if (addAssetForm) {
     addAssetForm.addEventListener('submit', onAddAssetSubmit(addAssetForm))
+    $(function () {
+        $('#publiclyViewableCheckbox').bootstrapToggle();
+    })
+
 }
 
 
