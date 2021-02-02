@@ -25,7 +25,7 @@ ARG BACKEND_PORT
 ENV BACKEND_PORT=$BACKEND_PORT
 #RUN printf
 RUN envsubst '${BACKEND_HOST}:${BACKEND_PORT}' < '/etc/nginx/nginx.conf.template' > '/etc/nginx/nginx.conf'
-#RUN cat /etc/nginx/nginx.conf
+RUN cat /etc/nginx/nginx.conf
 
 ENV PYTHONPATH /code:$PYTHONPATH
 ENV PAIPASS_BACKEND_SRC /code

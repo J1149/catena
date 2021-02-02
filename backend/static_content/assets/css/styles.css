@@ -7,6 +7,7 @@
 @import url("https://cdn.jsdelivr.net/npm/bs-stepper/dist/css/bs-stepper.min.css");
 @import url("https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css");
 
+@import "landing_page.css";
 @import "asset_modal.css";
 @import "asset_card.css";
 @import "add_asset.css";
@@ -15,6 +16,10 @@
 .catena-tooltip {
     color: #A9A9A9;
 }
+
+/** landing page **/
+
+/** end landing page **/
 
 .center_div {
     margin: 0 auto;
@@ -57,6 +62,12 @@
     display: grid;
     place-items: center;
 
+}
+
+.profile-buttons {
+    display: grid;
+    place-items: center;
+    grid-template-columns: auto auto;
 }
 
 .catena-asset {

@@ -542,6 +542,9 @@ class AssetView(View):
         return HttpResponse({'detail': 'success'})
 
 
+
+
+
 class EditAssetView(TemplateView):
     template_name = 'assets/edit_asset.html'
     http_method_names = ('get', 'post')

@@ -52,10 +52,10 @@
                 </div>
                 <div class="form-group">
                     <label for="formControlInput4">PAI Coin Public Key&nbsp;
-                                <a class='catena-tooltip' href="#" data-toggle="tooltip"
-                                   title="Your public key which is effectively your username.">
-                                    <i class="fa fa-question-circle"></i>
-                                </a>
+                        <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                           title="Your public key which is effectively your username.">
+                            <i class="fa fa-question-circle"></i>
+                        </a>
                     </label>
                     <a target=_blank href="https://paichain.info/ui/address/{{ user_profile.public_key }}/">(PAI
                         Chain)</a>
@@ -64,16 +64,19 @@
                 </div>
                 <div class="form-group">
                     <label for="formControlInput5">Description&nbsp;
-                                <a class='catena-tooltip' href="#" data-toggle="tooltip"
-                                   title="The description of who you are.">
-                                    <i class="fa fa-question-circle"></i>
-                                </a>
+                        <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                           title="The description of who you are.">
+                            <i class="fa fa-question-circle"></i>
+                        </a>
                     </label>
                     <textarea name="description" class="form-control" id="formControlInput5"
                               rows="3">{{ user_profile.description }}</textarea>
                 </div>
-                <button type="submit" class="btn btn-primary mb-2">Save Description</button>
-                <button class="btn btn-primary refresh-user-data-button" type="button">Refresh PAI Pass Data</button>
+                <div class="profile-buttons">
+                    <button type="submit" class="btn btn-primary mb-2">Save Changes</button>
+                    <button class="btn btn-primary refresh-user-data-button" type="button">Refresh PAI Pass Data
+                    </button>
+                </div>
             {% else %}
                 <div class="form-group">
                     <label for="formControlInput6">Account Type&nbsp;

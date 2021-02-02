@@ -2,6 +2,10 @@ from django.views.generic import TemplateView
 from assets.views import add_gallery_context_data
 
 
+class LandingView(TemplateView):
+    template_name = 'landing.html'
+
+
 class IndexPageView(TemplateView):
     template_name = 'main/index.html'
 

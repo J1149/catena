@@ -8,6 +8,7 @@ import Cropper from 'cropperjs';
 import Viewer from 'viewerjs';
 import Cookies from 'js-cookie';
 import 'bootstrap-toggle';
+
 var cropper = null;
 var viewer = null;
 
@@ -267,15 +268,74 @@ $("#assetImgUploads").change(function () {
 
 
 $(document).ready(function () {
+    console.log(1)
+    if ($('.add-asset-nxt-btn').length) {
+        const stepper1 = new Stepper($('.bs-stepper')[0])
+        $('.add-asset-nxt-btn').click(function () {
+            stepper1.next();
+        })
+        $('.add-asset-prev-btn').click(function () {
+            stepper1.previous();
+        })
+    }
 
-    const stepper1 = new Stepper($('.bs-stepper')[0])
+    // landing page
 
-    $('.add-asset-nxt-btn').click(function () {
-        stepper1.next();
-    })
-    $('.add-asset-prev-btn').click(function () {
-        stepper1.previous();
-    })
+    $(window).bind('scroll', function (e) {
+        dotnavigation();
+    });
+
+    function dotnavigation() {
+
+        var numSections = $('.landing-image-container').length;
+
+        $('#dot-nav li a').removeClass('active').parent('li').removeClass('active');
+        // console.log($('section'))
+        // console.log('$(\'section\').length',$('section').length)
+        $('.landing-image-container').each(function (i, item) {
+            var ele = $(item), nextTop;
+            console.log(ele)
+            if (typeof ele.next().offset() != "undefined") {
+                nextTop = ele.next().offset().top;
+            } else {
+                nextTop = $(document).height();
+            }
+            var thisTop = 0;
+            if (ele.offset() !== null) {
+                thisTop = ele.offset().top - ((nextTop - ele.offset().top - 500) / numSections);
+            } else {
+                thisTop = 0;
+            }
+
+            var docTop = $(document).scrollTop();
+
+            if (docTop >= thisTop && (docTop < nextTop)) {
+                $('#dot-nav li').eq(i).addClass('active');
+            }
+        });
+    }
+
+    /* get clicks working */
+    $('#dot-nav li').click(function () {
+        console.log('click')
+        var id = $(this).find('a').attr("href"),
+            posi,
+            ele,
+            padding =0;
+
+        ele = $(id);
+        console.log('ele', ele)
+        console.log('id', id)
+        posi =  ($(ele).offset() ).top - padding;// $(document).scrollTop();//$(document).height();//Math.ceil((window.innerHeight * 50 / 100)); //($(ele).offset() ).top - padding;
+        console.log('ele', ele)
+        console.log('posi', posi )
+        console.log('id', id)
+        var res = $('html, body').animate({scrollTop: posi}, 200,'linear');
+        console.log(res)
+
+        return false;
+    });
+    //end landing page
 
 })
 

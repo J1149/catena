@@ -1,0 +1,126 @@
+body, html .landing-page {
+    height: 100%;
+}
+
+.landing-page {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-flow: column nowrap;
+
+}
+
+.scrollability {
+    scroll-snap-type: y mandatory;
+    /* this makes the snapping work for some reason */
+    /*height: 100vh;*/
+    overflow: scroll;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+
+    display: grid;
+    grid-template-rows: auto;
+    grid-template-columns: auto;
+    place-items: center;
+    text-align: center;
+}
+
+.landing-image-container {
+
+    text-align: center;
+    flex: none;
+
+    object-fit: contain;
+
+    height: 100vh;
+    align-items: center;
+
+    margin-right: auto;
+    margin-left: auto;
+    position: relative;
+    display: flex;
+}
+
+.landing-image-container > img {
+    max-width: 500px;
+    height: auto;
+    scroll-snap-align: center;
+}
+
+.scrollability::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* Chrome/Safari/Webkit */
+}
+
+
+#dot-nav {
+    position: fixed;
+    float: right;
+    left: 10px;
+    top: 50%;
+    margin-top: -50px;
+    height: 100px;
+    z-index: 999;
+}
+
+#dot-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#dot-nav li {
+    position: relative;
+    background-color: #fbfafa;
+    border: 3px solid #0e0c0c;
+    border-radius: 15px 15px 15px 15px;
+    cursor: pointer;
+    padding: 5px;
+    height: 10px;
+    margin: 0px 0px 10px 10px;
+    width: 10px;
+    vertical-align: bottom;
+}
+
+#dot-nav li.active, #dot-nav li:hover {
+    background-color: #da2323;
+
+}
+
+#dot-nav a {
+    outline: 0;
+    vertical-align: top;
+    margin: 0px 0px 25px 0px;
+    position: relative;
+    top: -5px;
+}
+
+#joinUs {
+    text-align: center;
+}
+
+.landing-join-us-btn {
+    font-family: "Roboto", Sans-serif;
+    font-size: 40px;
+    font-weight: 500;
+    background-color: #DA0000 !important;
+    border-radius: 20px 20px 20px 20px;
+    padding: 30px 90px 30px 90px;
+    color: #fff !important;
+
+}
+
+.awesome-tooltip + .tooltip > .tooltip-inner {
+    /*background-color: #8e44ad;*/
+    color: #f5f5f5;
+    border: 1px solid #0e0c0c;
+}
+
+.awesome-tooltip + .tooltip.left > .tooltip-arrow {
+    top: 50%;
+    left: 0;
+    margin-top: -5px;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 5px solid #8e44ad;
+}

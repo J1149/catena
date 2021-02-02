@@ -15,11 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import IndexPageView
+from .views import (IndexPageView, LandingView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', IndexPageView.as_view(), name='index'),
+    path('', LandingView.as_view(), name='index'),
+    path('gallery/', IndexPageView.as_view(), name='index'),
     path('', include('django_messages.urls')),
     path('users/', include('users.urls')),
     path('assets/', include('assets.urls')),
