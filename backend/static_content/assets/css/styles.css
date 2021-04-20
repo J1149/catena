@@ -11,15 +11,35 @@
 @import "asset_modal.css";
 @import "asset_card.css";
 @import "add_asset.css";
+@import "edit_asset.css";
 @import "messages.css";
 
 .catena-tooltip {
     color: #A9A9A9;
 }
 
-/** landing page **/
+/*.messages-navbar-container {*/
+/*    position: relative;*/
+/*}*/
 
-/** end landing page **/
+/*.messages-navbar-container .messages-navbar-count {*/
+/*    position: absolute;*/
+/*    !*padding-left: 2%;*!*/
+/*    border:1px solid red;*/
+/*    height: 20px;*/
+/*    width: 20px;*/
+/*    !*bottom: 0;*!*/
+/*    !*right: 0;*!*/
+/*    color: white;*/
+/*    background-color: red;*/
+/*    border-radius: 50%;*/
+/*    -moz-border-radius:50%;*/
+/*    -webkit-border-radius:50%;*/
+/*}*/
+
+.btn-secondary {
+    background-color: #0e0c0c !important;
+}
 
 .center_div {
     margin: 0 auto;

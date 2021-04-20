@@ -16,4 +16,6 @@ urlpatterns = [
     url(r'^delete/(?P<message_id>[\d]+)/$', delete, name='messages_delete'),
     url(r'^undelete/(?P<message_id>[\d]+)/$', undelete, name='messages_undelete'),
     url(r'^trash/$', trash, name='messages_trash'),
+    url(r'^pai-messages/$', pai_messages, name='pai_messages'),
+    url(r'^pai-messages/(?P<recipients>[\w.@+-]+)/$', pai_messages, name='pai_messages'),
 ]

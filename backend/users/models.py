@@ -1,4 +1,5 @@
 from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib import admin
 from django.db import models
 from django.contrib.auth.models import (PermissionsMixin, BaseUserManager)
 from django.utils.translation import gettext_lazy as _
@@ -86,3 +87,6 @@ class CatenaUser(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
 
     objects = CatenaUserManager()
+
+
+#admin.site.register(CatenaUser)

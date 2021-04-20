@@ -1,6 +1,8 @@
 from io import BytesIO
 
 from django.core.files.base import ContentFile
+from django.contrib.auth import get_user_model
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import View, TemplateView
@@ -17,7 +19,24 @@ from PIL import Image
 from users.users import get_signup_url
 from users.models import CatenaUser
 
+
 ASSETS_PER_PAGE = 10
+
+
+def transform_timeline_events(timeline_events, convert_iso_format=True):
+    out = []
+    for (name, obj) in iter_obj(timeline_events, key_name=None, is_recursive=False):
+        te = TimelineEvent()
+        for (name_inner, inner_obj) in iter_obj(obj, key_name=None):
+            value = inner_obj['value']
+            if convert_iso_format and name_inner == 'timestamp':
+                value = datetime.fromisoformat(value)
+            setattr(getattr(te, name_inner), 'value', value)
+            if 'data_id' in inner_obj:
+                setattr(getattr(te, name_inner), 'data_id', inner_obj['data_id'])
+
+        out.append(te)
+    return out
 
 
 def append_field(d, name, value, type_, value_actual=None, ):
@@ -136,15 +155,51 @@ def to_thumbnail(img):
 DEFAULT_PUB_KEY_ADDR = 'via_paipass'
 
 
-def construct_tree(request, substitute_ids_from=None, has_images=False):
+def append_timeline_field(tree, name, value, type_, data_id=None, ):
+    tree['count'] += 1
+    field_internal_name = f'field{tree["count"]}'
+    d = {}
+    tree[field_internal_name] = d
+    d['name'] = name
+    d['value'] = value
+    d['fieldType'] = type_
+    if data_id is not None:
+        d['data_id'] = data_id
+
+
+def append_timeline_event_to_tree(timeline_events, timeline_event):
+    subsubtree = {}
+    timeline_events['count'] += 1
+    timeline_events[f"field{timeline_events['count']}"] = subsubtree
+    subsubtree['fieldType'] = 'OBJECT'
+    subsubtree['name'] = 'Timeline Event'
+    subsubtree['count'] = 0
+
+    if timeline_event.timestamp.value is None:
+        timeline_event.timestamp.value = datetime.utcnow().isoformat()
+
+    append_timeline_field(subsubtree, 'Event Name', timeline_event.event_name.value, 'TEXT',
+                          timeline_event.event_name.data_id)
+    append_timeline_field(subsubtree, 'Blockchain Address', timeline_event.blockchain_address.value, 'TEXT',
+                          timeline_event.blockchain_address.data_id)
+    append_timeline_field(subsubtree, 'Timestamp', timeline_event.timestamp.value, 'DATE',
+                          timeline_event.timestamp.data_id)
+
+
+def construct_tree(request, substitute_ids_from=None, has_images=False, is_new_submission=False):
     schema_uuid = settings.CATENA_SCHEMA_ASSET_UUID
     tree = {}
     tree['id'] = schema_uuid
     tree['uuid'] = str(uuid4())
     tree['count'] = 0
     tree['name'] = 'Catena Assets'
-    derived_tree = {'Asset Poster': request.user.email,
-                    'Asset Owner': request.user.email}
+
+    derived_tree = {}
+
+    asset_owner = derived_tree.get('Asset Owner', request.user.email)
+    derived_tree = {'Asset Owner': asset_owner,
+                    'Asset Poster': asset_owner,
+                    }
     derived_tree.update(request.POST.dict())
 
     asset_pub_key_addr = derived_tree.get('Asset Public Key Address', request.user.public_key)
@@ -186,29 +241,28 @@ def construct_tree(request, substitute_ids_from=None, has_images=False):
     append_fields(tree, derived_tree,
                   ['Name', 'Asset Owner', 'Asset Poster', 'Price', 'Price Units',
                    'Description', 'Artist'])
-
-    subtree = {}
+    tes_subtree = {}
     tree['count'] += 1
-    tree[f"field{tree['count']}"] = subtree
-    subtree['fieldType'] = 'LIST'
-    subtree['name'] = 'Timeline Events'
-    subtree['count'] = 0
+    tree[f"field{tree['count']}"] = tes_subtree
+    tes_subtree['fieldType'] = 'LIST'
+    tes_subtree['name'] = 'Timeline Events'
+    tes_subtree['count'] = 0
+    if is_new_submission:
+        subsubtree = {}
+        tes_subtree['count'] += 1
+        tes_subtree[f"field{tes_subtree['count']}"] = subsubtree
+        subsubtree['fieldType'] = 'OBJECT'
+        subsubtree['name'] = 'Timeline Event'
+        subsubtree['count'] = 0
 
-    subsubtree = {}
-    subtree['count'] += 1
-    subtree[f"field{subtree['count']}"] = subsubtree
-    subsubtree['fieldType'] = 'OBJECT'
-    subsubtree['name'] = 'Timeline Event'
-    subsubtree['count'] = 0
-
-    derived_tree['Blockchain Address'] = asset_pub_key_addr
-    derived_tree['Timestamp'] = datetime.utcnow().isoformat()
-    derived_tree['Event Name'] = derived_tree.get('Change Description', 'Initial Submission')
-    append_fields(subsubtree, derived_tree,
-                  ['Event Name', 'Blockchain Address', ])
-    append_fields(subsubtree, derived_tree, ('Timestamp',), field_type='DATE')
-    subtree['count'] += 1
-    subsubtree['count'] += 1
+        derived_tree['Blockchain Address'] = asset_pub_key_addr
+        derived_tree['Timestamp'] = datetime.utcnow().isoformat()
+        derived_tree['Event Name'] = derived_tree.get('Change Description', 'Initial Submission')
+        append_fields(subsubtree, derived_tree,
+                      ['Event Name', 'Blockchain Address', ])
+        append_fields(subsubtree, derived_tree, ('Timestamp',), field_type='DATE')
+    # subtree['count'] += 1
+    # subsubtree['count'] += 1
     out_files = None
     if has_images:
         subtree = {}
@@ -226,9 +280,12 @@ def construct_tree(request, substitute_ids_from=None, has_images=False):
 
         tree['count'] += 1
     if substitute_ids_from is not None:
-        for (key, obj) in iter_obj(tree, None):
+        for (key, obj) in iter_obj(tree, None, is_recursive=False):
             if key in substitute_ids_from:
                 obj['data_id'] = substitute_ids_from.get_field(key).data_id
+        for timeline_event in substitute_ids_from.timeline_events:
+            # append_change(tes_subtree, timeline_event.blockchain_address, timeline_event.event_name, timeline_event.timestamp, data_id=timeline_event.data_id)
+            append_timeline_event_to_tree(tes_subtree, timeline_event)
     return tree, out_files
 
 
@@ -237,12 +294,12 @@ class AddAssetView(TemplateView):
     http_method_names = ('get', 'post')
 
     def post(self, request, *args, **kwargs):
-        tree, out_files = construct_tree(request, has_images=True)
+        tree, out_files = construct_tree(request, has_images=True, is_new_submission=True)
 
         session = login()
         session.headers.update({'X-CSRFToken': session.cookies['csrftoken']})
         # The content-type found in the session headers disrupts what
-        # requests would otherwise put in their if it wasn't there.
+        # requests would have otherwise put in there if it wasn't there.
         del session.headers['content-type']
 
         # requests.post() strips out nested json so we need to put it into a string and then json.loads() the
@@ -256,6 +313,8 @@ class AddAssetView(TemplateView):
         response.raise_for_status()
 
         return HttpResponseRedirect('/')
+
+
 
 
 @dataclass
@@ -316,6 +375,7 @@ TXID_NOT_FOUND = 'Transaction Id Not Found'
 @dataclass
 class CatenaAsset:
     asset_id: str = None
+
     name: str = None
     asset_owner: str = None
     asset_poster: str = None
@@ -328,8 +388,22 @@ class CatenaAsset:
     shared_with: str = None
     txid: str = TXID_NOT_FOUND
     txid_url: str = None
+    blockchain_address: str = None
     timeline_events: list = field(default_factory=list)
     images: list = field(default_factory=list)
+
+
+@dataclass
+class TimelineValue:
+    value: 'typing.Any' = None
+    data_id: str = None
+
+
+@dataclass
+class TimelineEvent:
+    event_name: TimelineValue = field(default_factory=TimelineValue)
+    blockchain_address: TimelineValue = field(default_factory=TimelineValue)
+    timestamp: TimelineValue = field(default_factory=TimelineValue)
 
 
 class CatenaAssetRawishField:
@@ -347,20 +421,33 @@ class CatenaAssetRawish:
         self._d = d
         self._fields = []
         self._names_to_assets = {}
+        self.timeline_events = tuple()
         self.generate_fields(d)
 
     def generate_fields(self, d):
-        for (key, obj) in iter_obj(d, None):
-            if obj['fieldType'].upper() == 'LIST' or obj['fieldType'].upper() == 'OBJECT':
-                continue
-            if obj['data_id'] is None:
-                continue
-            car = CatenaAssetRawishField(name=obj['name'], value=obj['value'], data_id=obj['data_id'])
-            self.append_field(car)
+        for (key, obj) in iter_obj(d, None, is_recursive=False):
+
+            if key == 'timeline_events':
+                self.timeline_events = transform_timeline_events(obj, convert_iso_format=False)
+            else:
+                fieldType = obj['fieldType'].upper()
+                if fieldType == 'LIST' or fieldType == 'OBJECT':
+                    continue
+                if obj['data_id'] is None:
+                    continue
+                car = CatenaAssetRawishField(name=obj['name'], value=obj['value'], data_id=obj['data_id'])
+                self.append_field(car)
 
     def append_field(self, car):
         self._fields.append(car)
-        self._names_to_assets[car.name] = car
+        if car.name not in self._names_to_assets:
+            self._names_to_assets[car.name] = car
+        else:
+            if isinstance(self._names_to_assets[car.name], list):
+                self._names_to_assets[car.name].append(car)
+            else:
+                old_car = self._names_to_assets[car.name]
+                self._names_to_assets[car.name] = [old_car, car]
 
     def __contains__(self, item):
         return item in self._names_to_assets
@@ -395,7 +482,7 @@ def yield_pair(name, obj, key_name, image_key_name):
         return name, obj
 
 
-def iter_obj(assets_obj, key_name, image_key_name=None):
+def iter_obj(assets_obj, key_name, image_key_name=None, is_recursive=True):
     if image_key_name is None:
         image_key_name = key_name
     for key, obj in assets_obj.items():
@@ -403,13 +490,30 @@ def iter_obj(assets_obj, key_name, image_key_name=None):
             # field_type = assets_obj['fieldType']
             name = normalize_name(obj['name'])
 
-            if obj['fieldType'].upper() == 'OBJECT' or obj['fieldType'].upper() == 'LIST':
+            if is_recursive and (obj['fieldType'].upper() == 'OBJECT' or obj['fieldType'].upper() == 'LIST'):
                 yield yield_pair(name, obj, key_name, image_key_name)
                 for (subkey, subobj) in iter_obj(obj, key_name, image_key_name):
                     yield (subkey, subobj)
             else:
                 name, obj = yield_pair(name, obj, key_name, image_key_name)
                 yield name, obj
+
+
+def get_obj_from_obj(from_obj, key_name):
+    for (name, obj) in iter_obj(from_obj, key_name='value'):
+        if normalize_name(key_name) == name:
+            return obj
+    return None
+
+
+def get_most_recent_blockchain_addr(timeline_events):
+    count = timeline_events['count']
+    latest_timeline_event = timeline_events['field' + str(count - 1)]
+    for (name, value) in iter_obj(latest_timeline_event, key_name='value'):
+        if name.lower() == 'blockchain_address'.lower():
+            return value
+
+    return None
 
 
 def transform(data):
@@ -428,9 +532,16 @@ def transform(data):
             else:
                 setattr(catena_asset, normalize_name(name), value)
         setattr(catena_asset, 'shared_with', catena_assets_set['shared_with'])
+
+        blockchain_address = get_most_recent_blockchain_addr(catena_asset.timeline_events)
+        if blockchain_address is None:
+            settings.LOGGER.critical(f'Asset blockchain address was none for asset_id {catena_asset.asset_id}')
+        setattr(catena_asset, 'blockchain_address', blockchain_address)
+
         if catena_assets_set['txid'] is not None:
             setattr(catena_asset, 'txid', catena_assets_set['txid'][:txid_truncation_len] + '...')
             setattr(catena_asset, 'txid_url', f"https://paichain.info/ui/tx/{catena_assets_set['txid']}")
+
         catena_assets.append(catena_asset)
     return catena_assets
 
@@ -489,6 +600,7 @@ def add_gallery_context_data(context, request, query_params=None):
 
     if query_params is None:
         query_params = {}
+
     session = login()
     page = request.GET.get('page', 1)
 
@@ -508,7 +620,8 @@ def add_gallery_context_data(context, request, query_params=None):
         elif request.user.public_key == dataset.asset_owner:
             dataset.asset_owner = 'self'
         else:
-            dataset.dm_url = reverse('messages_compose_to', kwargs={'recipient': dataset.asset_owner})
+            dataset.dm_url = reverse('pai_messages', kwargs={'recipients': dataset.asset_owner}) +\
+                             '?name=' + dataset.name + '&about=' + dataset.blockchain_address
         if dataset.asset_owner == 'self':
             dataset.profile_url = reverse('users:profile')
         else:
@@ -542,7 +655,29 @@ class AssetView(View):
         return HttpResponse({'detail': 'success'})
 
 
+def append_change(catena_asset, asset_pub_key_addr, change_reason, timestamp=None, data_id=None):
+    subtree = get_obj_from_obj(catena_asset, 'timeline events')
+    if subtree is None:
+        raise ValueError(f'obj is none for {catena_asset} when searching for timeline events')
 
+    subsubtree = {}
+    subtree['count'] += 1
+    subtree[f"field{subtree['count']}"] = subsubtree
+    subsubtree['fieldType'] = 'OBJECT'
+    subsubtree['name'] = 'Timeline Event'
+    subsubtree['count'] = 0
+
+    fake_catena_asset = {}
+    fake_catena_asset['Blockchain Address'] = asset_pub_key_addr
+    if timestamp is None:
+        fake_catena_asset['Timestamp'] = datetime.utcnow().isoformat()
+    else:
+        fake_catena_asset['Timestamp'] = timestamp
+    fake_catena_asset['Event Name'] = fake_catena_asset.get('Change Description', change_reason)
+    append_fields(subsubtree, fake_catena_asset,
+                  ['Event Name', 'Blockchain Address', ])
+    append_fields(subsubtree, fake_catena_asset, ('Timestamp',), field_type='DATE')
+    return catena_asset
 
 
 class EditAssetView(TemplateView):
@@ -567,6 +702,46 @@ class EditAssetView(TemplateView):
             return HttpResponse({'detail': 'user does not own the asset'}, status=403)
 
         tree, _ = construct_tree(request, substitute_ids_from=catena_asset, has_images=False)
+        asset_pub_key_addr = request.POST.get('Asset Public Key Address', request.user.public_key)
+        append_change(tree, asset_pub_key_addr, 'Edit')
+        session.headers.update({'X-CSRFToken': session.cookies['csrftoken']})
+        data = {'tree': json.dumps(tree)}
+
+        url = settings.PAIPASS_API_DOMAIN + f'api/v1/yggdrasil/dataset/{asset_id}/'
+        response = session.put(url, data=data)
+        response.raise_for_status()
+        return HttpResponseRedirect(reverse('assets:index'))
+
+
+class TransferAssetView(TemplateView):
+    template_name = 'assets/transfer_asset.html'
+    http_method_names = ('get', 'post')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        asset_id = kwargs['asset_id']
+        catena_asset = get_data_bundle((asset_id,))[0]
+        context['catena_asset'] = catena_asset
+        if catena_asset.shared_with == 'everyone':
+            context['checked'] = 'checked'
+        else:
+            context['checked'] = ''
+        return context
+
+    def post(self, request, asset_id, *args, **kwargs):
+        session = login()
+        catena_asset = get_data_bundle((asset_id,), session=session, transform_to='CatenaAssetRawish')[0]
+        if catena_asset['asset_owner'] != request.user.public_key:
+            return HttpResponse({'detail': 'user does not own the asset'}, status=403)
+        # this makes the request.POST mutable
+        request.POST = request.POST.copy()
+        new_owner = get_user_model().objects.all().get(public_key=request.POST['Asset Owner']).email
+        request.POST['Asset Owner'] = new_owner
+        request.POST['Asset Poster'] = new_owner
+        tree, _ = construct_tree(request, substitute_ids_from=catena_asset, has_images=False)
+
+        asset_pub_key_addr = request.POST.get('Asset Public Key Address', request.user.public_key)
+        append_change(tree, asset_pub_key_addr, 'Transfer')
 
         session.headers.update({'X-CSRFToken': session.cookies['csrftoken']})
         data = {'tree': json.dumps(tree)}
@@ -598,3 +773,28 @@ class ImageView(View):
         out_response = HttpResponse(response.content, content_type="image/jpeg")
         out_response['Cache-Control'] = 'max-age=86400'
         return out_response
+
+
+def get_provenance(data_id):
+    url = settings.PAIPASS_API_DOMAIN + 'api/v1/yggdrasil/data-bundle/' + '?id=' + data_id
+    session = login()
+    response = session.get(url)
+    response.raise_for_status()
+    data = response.json()
+    catena_asset = transform(data)[0]
+
+    timeline_events = transform_timeline_events(catena_asset.timeline_events)
+
+    return timeline_events
+
+
+class AssetProvenanceView(TemplateView):
+    template_name = 'assets/asset_provenance.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['provenance_list'] = get_provenance(kwargs['asset_id'])
+        context['is_home_page'] = False
+        return context
+
+

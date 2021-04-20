@@ -7,55 +7,103 @@
         <div></div>
         <form class="container center_div" id="edit-asset-form" method="post">
             {% csrf_token %}
+            <div class="form-row">
+                <label class="add-asset-label" for="formControlInput0">
+                    Asset Name &nbsp;
+                    <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                       title="The name of the artwork.">
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </label>
 
 
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Asset Name</span>
-                </div>
                 <input type="text" name="Name" class="form-control" id="formControlInput0"
                        placeholder="Mona Lisa" required="" value="{{ catena_asset.name }}">
             </div>
 
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Artist</span>
-                </div>
+            <div class="form-row">
+
+                <label class="add-asset-label" for="formControlInput2">
+                    Artist &nbsp;
+                    <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                       title="The name of artist who created the artwork.">
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </label>
                 <input type="text" name="Artist" class="form-control" id="formControlInput2"
                        placeholder="Leonardo da Vinci" required="" value="{{ catena_asset.artist }}">
             </div>
 
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Price</span>
-                </div>
-                <div class="input-group-prepend">
-                    <span class="input-group-text">$</span>
-                </div>
+            <div class="form-row">
 
-                <input id="input_price" type="text" name="Price" class="form-control"
-                       aria-label="Amount (to the nearest dollar)"
-                value="{{ catena_asset.price }}">
-                <div class="input-group-append">
-                    <span class="input-group-text">.00</span>
+                <label class="add-asset-label">
+                    Price &nbsp;
+                    <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                       title="The price of the artwork.">
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+
+                </label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">PAI</span>
+                    </div>
+
+                    <input id="input_price" type="text" name="Price" class="form-control"
+                           aria-label="Amount (to the nearest dollar)" value="{{ catena_asset.price }}">
+                    <div class="input-group-append">
+                        <span class="input-group-text">.00</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Description</span>
-                </div>
+            <div class="form-row">
+
+                <label class="add-asset-label" for="formControlInput2">
+                    Asset Public Key Address &nbsp;
+                    <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                       title="The address to send paicoin to in order to pay for the artwork.">
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </label>
+                <input type="text" name="Asset Public Key Address" class="form-control" id="formControlInput2"
+                       placeholder="{{ user.public_key }}" required="" value="{{ catena_asset.blockchain_address }}">
+            </div>
+
+            <div class="form-row">
+
+                <label class="add-asset-label">
+                    Description &nbsp;
+                    <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                       title="The description of the artwork.">
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </label>
                 <textarea type="text" name="Description" class="form-control" id="formControlTextarea1"
                           rows="3">{{ catena_asset.description }}</textarea>
             </div>
 
-            <label class="switch">
-                <span class="slider round">Publicly Viewable?</span>
-                <input type="checkbox" name="Public" {{ checked }} data-toggle="toggle">
-            </label>
+            <div class="form-row">
+                <div class="checkbox" id="publiclyViewableCheckboxDiv">
+                    <label class="add-asset-label">
+                        Privacy
+                        <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                           title="This determines whether people other than you can view the artwork.">
+                            <i class="fa fa-question-circle"></i>
+                        </a>
+                    </label>
+                    <label>
+                        <input id="publiclyViewableCheckbox" type="checkbox" {{ checked }} name="Public"
+                               data-on="Public" data-off="Private"
+                               data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+                    </label>
+                </div>
+            </div>
+
+
             <div class="edit-asset-button-container">
-{#                <button class="btn btn-primary edit-asset-close-btn" type="button">Close</button>#}
-                <button type="submit" class="btn btn-primary" >Submit </button>
+                {#                <button class="btn btn-primary edit-asset-close-btn" type="button">Close</button>#}
+                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
 
 

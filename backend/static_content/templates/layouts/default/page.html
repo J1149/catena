@@ -13,7 +13,7 @@
     <meta name="description" content="Catena Art Gallery.">
     <meta name="author" content="Ryan Hernandez">
 
-{#    <link rel="icon" href="{% static 'favicon.ico' %}">#}
+    {#    <link rel="icon" href="{% static 'favicon.ico' %}">#}
     <link type="text/css" href="{% static 'css/styles.css' %}" rel="stylesheet">
     <title>Catena</title>
 </head>
@@ -33,7 +33,19 @@
                     <a class="nav-link" href="{% url 'assets:index' %}">{% trans 'Assets' %}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'messages_inbox' %}">{% trans 'Messages' %}</a>
+                    <div class="messages-navbar-container">
+                        <a class="nav-link" href="{% url 'pai_messages' %}">{% trans 'Messages' %}
+{#                            {% if messages_inbox_count > 0 and messages_inbox_count < 10 %}#}
+{#                                <span class="badge badge-pill badge-primary">{{ messages_inbox_count }}</span>#}
+{#                            {% elif messages_inbox_count > 9 %}#}
+{#                                <span class="badge badge-pill badge-primary">9+</span>#}
+{#                            {% endif %}#}
+                        </a>
+                        {#                        <span class="badge badge-pill badge-primary" style="float:right;margin-top:-15px;">1</span>#}
+
+                        {#                        <b class="messages-navbar-count">1</b>#}
+
+                    </div>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'users:profile' %}">{% trans 'Profile' %}</a>
@@ -67,7 +79,8 @@
     {% bootstrap_messages %}
     <div class="main-page-wrapper">
         {% block section %}
-            No content.<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+            No content.
+            <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
         {% endblock %}
     </div>

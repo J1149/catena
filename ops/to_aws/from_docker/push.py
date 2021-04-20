@@ -206,7 +206,7 @@ if __name__ == '__main__':
     # underscores are for refactoring needs (specifically, to make old stuff break due to new names).
 
     _deployment_env = 'staging'
-    _docker_tag_name = 'sans-django-webserver2'
+    _docker_tag_name = 'paimsgs1'
     # use if repository exist
     push_cfg.tag = _docker_tag_name
     push_cfg.deployment_env = _deployment_env

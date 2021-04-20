@@ -12,6 +12,10 @@ import 'bootstrap-toggle';
 var cropper = null;
 var viewer = null;
 
+import zoid from 'zoid';
+
+// const URL_BASE = 'https://paipass.p19dev.com';
+
 
 function onDeleteAsset(assetId) {
     let csrftoken = Cookies.get('csrftoken');
@@ -33,12 +37,25 @@ function onEditAsset(assetId) {
     }
 };
 
+function onTransferAsset(assetId) {
+    return () => {
+        window.location.replace(`/assets/transfer/${assetId}/`)
+    }
+};
+
+function onProvenance(assetId) {
+    return () => {
+        window.location.replace(`/assets/provenance/${assetId}/`)
+    }
+
+}
 
 $('#assetModal').on('show.bs.modal', function (event) {
     const button = $(event.relatedTarget) // Button that triggered the modal
     const assetOwner = button.data('asset-owner')
     const modalTitle = button.data('asset-artist')
     const assetId = button.data('asset-id')
+    const assetBlockchainAddress = button.data('asset-blockchain-address');
     const artworkName = button.data('asset-name')
     const description = button.data('asset-description')
     const images = button.data('asset-images')
@@ -65,7 +82,10 @@ $('#assetModal').on('show.bs.modal', function (event) {
 
     modal.find('.modal-body #asset-images').val(images)
     modal.find('.modal-body #assetDescription').text(description)
-    modal.find('#assetPrice').text(`\$${price}`)
+    modal.find('#assetPrice').text(`PAI: ${price}`)
+    modal.find('#assetBlockchainAddressUrl').text(`${assetBlockchainAddress}`)
+    modal.find('#assetBlockchainAddressUrl').attr('href', `https://paichain.info/ui/address/${assetBlockchainAddress}/`)
+
     modal.find('.modal-body #assetUserProfileUrl').text(assetOwner)
     modal.find('.modal-body #assetUserProfileUrl').attr('href', assetOwnerProfileUrl)
 
@@ -73,7 +93,7 @@ $('#assetModal').on('show.bs.modal', function (event) {
     const buttonsDiv = modal.find('#asset-modal-buttons');
 
     const transactionIdDiv = modal.find('#transactionIdDiv')
-    transactionIdDiv.append(`<p>Transaction ID:</p>`);
+    transactionIdDiv.append(`<p class="modal-info">Transaction ID:</p>`);
     if (assetTxid === 'Transaction Id Not Found') {
 
         transactionIdDiv.append(`<i id="assetTxid">${assetTxid}</i>`)
@@ -84,13 +104,21 @@ $('#assetModal').on('show.bs.modal', function (event) {
     //modal.find('.modal-body #assetTxid').text(assetTxid)
 
     buttonsDiv.append(`<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>`)
+    buttonsDiv.append(`<button type="button" class="btn btn-secondary" id="provenanceButton">Provenance</button>`)
+    modal.find('#provenanceButton').click(onProvenance(assetId))
+
+
     if (assetOwner === 'self') {
         // Delete button
-        buttonsDiv.append(`<a id="deleteAssetButton" type="button" class="btn modal-btn-delete">Delete Asset</a>`)
+        buttonsDiv.append(`<a id="deleteAssetButton" type="button" class="btn modal-btn-delete">Delete</a>`)
         modal.find('#deleteAssetButton').click(onDeleteAsset(assetId))
         // Edit button
-        buttonsDiv.append(`<a id="editAssetButton" type="button" class="btn btn-secondary">Edit Asset</a>`)
+        buttonsDiv.append(`<a id="editAssetButton" type="button" class="btn btn-secondary">Edit</a>`)
         modal.find('#editAssetButton').click(onEditAsset(assetId))
+        // Transfer button
+        buttonsDiv.append(`<a id="transferAssetButton" type="button" class="btn btn-secondary">Transfer</a>`)
+        modal.find('#transferAssetButton').click(onTransferAsset(assetId))
+
     } else {
         buttonsDiv.append(`<a id="sendMessageButton" type="button" class="btn btn-secondary">Send message</a>`)
         modal.find('.modal-footer #sendMessageButton').attr('href', assetOwnerDmUrl)
@@ -266,20 +294,46 @@ $("#assetImgUploads").change(function () {
     onAssetImgsUploadChange(this);
 });
 
-
-$(document).ready(function () {
-    console.log(1)
-    if ($('.add-asset-nxt-btn').length) {
+function addAssetFormValidation() {
+    const validity = $('#add-asset-form')[0].checkValidity();
+    console.log('validity ' + validity)
+    if ($('#assetImgUploads').val() && validity) {
         const stepper1 = new Stepper($('.bs-stepper')[0])
-        $('.add-asset-nxt-btn').click(function () {
-            stepper1.next();
-        })
-        $('.add-asset-prev-btn').click(function () {
-            stepper1.previous();
-        })
-    }
 
-    // landing page
+        stepper1.next();
+    } else {
+
+    }
+    $('#add-asset-form')[0].classList.add('was-validated');
+
+}
+
+function init_add_asset_form() {
+    console.log($('#add-asset-form'))
+    // $('#add-asset-form').validate({
+    //     rules: {
+    //         Artist: {
+    //             minlength: 2,
+    //             required: true
+    //         }
+    //
+    //     },
+    //     error: function () {
+    //         console.log('hello error')
+    //     },
+    //     success: function () {
+    //         console.log('hello success')
+    //     }
+    // })
+    const stepper1 = new Stepper($('.bs-stepper')[0])
+    $('.add-asset-nxt-btn').click(addAssetFormValidation)
+    $('.add-asset-prev-btn').click(function () {
+        stepper1.previous();
+    })
+}
+
+
+function init_landing_page() {
 
     $(window).bind('scroll', function (e) {
         dotnavigation();
@@ -317,26 +371,72 @@ $(document).ready(function () {
 
     /* get clicks working */
     $('#dot-nav li').click(function () {
-        console.log('click')
         var id = $(this).find('a').attr("href"),
             posi,
             ele,
-            padding =0;
+            padding = 0;
 
         ele = $(id);
-        console.log('ele', ele)
-        console.log('id', id)
-        posi =  ($(ele).offset() ).top - padding;// $(document).scrollTop();//$(document).height();//Math.ceil((window.innerHeight * 50 / 100)); //($(ele).offset() ).top - padding;
-        console.log('ele', ele)
-        console.log('posi', posi )
-        console.log('id', id)
-        var res = $('html, body').animate({scrollTop: posi}, 200,'linear');
-        console.log(res)
-
+        posi = ($(ele).offset()).top - padding;// $(document).scrollTop();//$(document).height();//Math.ceil((window.innerHeight * 50 / 100)); //($(ele).offset() ).top - padding;
+        var res = $('html, body').animate({scrollTop: posi}, 200, 'linear');
         return false;
     });
-    //end landing page
 
+
+    //end landing page
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip({trigger: 'click focus hover'})
+    })
+    $('[data-toggle="tooltip"]').on('click', function () {
+        $(this).tooltip('hide')
+    })
+}
+
+function init_pai_messages() {
+    const thread = JSON.parse(document.getElementById('thread-data').textContent);
+    const application = JSON.parse(document.getElementById('application-data').textContent);
+    const URL_BASE = document.getElementById('PAIPASS_URL').value;
+    console.log('URL_BASE', URL_BASE)
+    const PaiMsgsZoidComponent = zoid.create({
+
+        // The html tag used to render my component
+
+        tag: 'pai-msgs-component',
+
+        // The url that will be loaded in the iframe or popup, when someone includes my component on their page
+
+        url: new URL(`${URL_BASE}/pai-messages`, window.location.href).href,
+        dimensions: {
+            width: '100%',
+            height: '100%',
+        },
+        props: {
+            thread: {
+                type: 'object',
+            },
+            application: {
+                type: 'object',
+            }
+        }
+    });
+    PaiMsgsZoidComponent({thread: thread, application: application}).render('#pai-messages-iframe-div')
+
+}
+
+$(document).ready(function () {
+    // add asset form
+    if ($('.add-asset-nxt-btn').length) {
+        init_add_asset_form();
+    }
+
+    // landing page
+    if ($('#landing-page').length) {
+        init_landing_page();
+    }
+
+    if ($('#pai-messages-iframe-div').length) {
+        init_pai_messages()
+    }
 })
 
 

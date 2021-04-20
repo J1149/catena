@@ -1,0 +1,37 @@
+{% extends 'assets/index.html' %}
+
+{% load i18n %}
+
+{% block content %}
+    <h1>{% trans "Asset Provenance" %}</h1>
+    <table class="table table-bordered messages">
+        <thead>
+        <tr>
+            <th>{% trans "Change Type" %}</th>
+            <th>{% trans "Blockchain Address" %}</th>
+            <th>{% trans "Change Date" %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for provenance_item in provenance_list %}
+            <tr>
+                <td class="row-message-subject message-row-cell">
+                    {{  provenance_item.event_name.value }}
+                </td>
+
+                <td class="row-message-sender message-row-cell">
+                    <a target=_blank href="https://paichain.info/ui/address/{{ provenance_item.blockchain_address.value }}/">{{ provenance_item.blockchain_address.value }}</a>
+                </td>
+
+                <td class="message-row-cell row-message-sent-date">
+                    {{ provenance_item.timestamp.value|date:_("h:i A") }}
+                    <br/>
+                    {{ provenance_item.timestamp.value|date:_("m/d/Y") }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+

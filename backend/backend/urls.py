@@ -17,13 +17,14 @@ from django.contrib import admin
 from django.urls import path, include
 from .views import (IndexPageView, LandingView)
 
+admin.site.site_header = 'Catena Art Administration'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', LandingView.as_view(), name='index'),
+    path('', LandingView.as_view(), name='landing-page'),
     path('gallery/', IndexPageView.as_view(), name='index'),
     path('', include('django_messages.urls')),
     path('users/', include('users.urls')),
     path('assets/', include('assets.urls')),
-
-
+    path('api/v1/assets/', include('assets.api_urls')),
 ]

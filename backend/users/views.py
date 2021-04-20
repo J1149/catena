@@ -169,7 +169,7 @@ class LoginTokenView(View):
 
         login(request, user)
 
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
 
 
 class LogoutView(View):
@@ -177,7 +177,7 @@ class LogoutView(View):
 
     def get(self, request, *args, **kwargs):
         logout(request)
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
 
 
 @dataclass
@@ -189,8 +189,6 @@ class UserProfile:
     public_key: str = None
     description: str = None
     is_user_requesting_themself: bool = False
-
-
 
 
 class ProfileView(TemplateView):
@@ -214,10 +212,10 @@ class ProfileView(TemplateView):
         up.account_type = user.account_type
         up.public_key = user.public_key
         up.description = user.description
-        up.dm_url = reverse('messages_compose_to', kwargs={'recipient': up.public_key})
+        recipient = up.public_key
+        up.dm_url = reverse('pai_messages', kwargs={'recipients': recipient})
 
         return context
-
 
     def post(self, request, *args, **kwargs):
         user = request.user

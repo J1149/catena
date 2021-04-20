@@ -15,6 +15,8 @@ import logging
 import os
 import sys
 
+
+LOGIN_URL = 'users:login'
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 CONTENT_DIR = os.path.join(BASE_DIR, 'static_content')
@@ -96,14 +98,14 @@ if is_in_cloud(DEPLOYMENT_ENV.lower()):
     # this setting to enable cross-domain cookies on a site that previously used
     # standard domain cookies, existing user cookies will be set to the old domain.
     # This may result in them being unable to log in as long as these cookies persist.
-    SESSION_COOKIE_DOMAIN = '.' + os.environ['BACKEND_HOST']
+    SESSION_COOKIE_DOMAIN = '.' + os.environ['BACKEND_HOST'] + BACKEND_PORT
     # The domain to be used when setting the CSRF cookie. This can be
     # useful for easily allowing cross-subdomain requests to be
     # excluded from the normal cross site request forgery protection.
     # It should be set to a string such as "example.com" to allow a
     # POST request from a form on one subdomain to be accepted by a
     # view served from another subdomain.
-    CSRF_COOKIE_DOMAIN = '.' + os.environ['BACKEND_HOST']
+    CSRF_COOKIE_DOMAIN = '.' + os.environ['BACKEND_HOST'] + BACKEND_PORT
     # Whether to use HttpOnly flag on the CSRF cookie. If this is set to True,
     # client-side JavaScript will not be able to access the CSRF cookie.
     #
@@ -132,6 +134,11 @@ if is_in_cloud(DEPLOYMENT_ENV.lower()):
 
 else:
     DEBUG = True
+    SESSION_COOKIE_DOMAIN = os.environ['BACKEND_HOST']
+    SESSION_COOKIE_NAME = BACKEND_PORT
+
+
+
 
 
 # Application definition
@@ -145,6 +152,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap4',
     'corsheaders',
+    'rest_framework',
     'users.apps.UsersConfig',
     'assets.apps.AssetsConfig',
     'django_messages.apps.DjangoMessagesConfig',
@@ -177,6 +185,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django_messages.context_processors.inbox'
             ],
         },
     },
@@ -269,6 +278,19 @@ STATICFILES_DIRS = [
 LOCALE_PATHS = [
     os.path.join(CONTENT_DIR, 'locale')
 ]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ]
+}
 
 PAIPASS_REQ_KEY_NAMES = ['email', 'phone', 'name', 'paicoin_address']
 PAIPASS_REQ_SCOPES = []

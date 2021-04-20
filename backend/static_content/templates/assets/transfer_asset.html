@@ -1,0 +1,97 @@
+{% extends 'assets/index.html' %}
+
+{% load i18n %}
+
+{% block content %}
+    <div class="edit-asset-container">
+        <div></div>
+        <form class="container center_div" id="edit-asset-form" method="post">
+            {% csrf_token %}
+            <div class="form-row">
+                <label class="add-asset-label" for="formControlInput0">
+                    Asset Name &nbsp;
+                    <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                       title="The name of the artwork.">
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </label>
+
+
+                <input type="text" name="Name" class="form-control" id="formControlInput0"
+                       placeholder="Mona Lisa" readonly value="{{ catena_asset.name }}">
+            </div>
+
+            <div class="form-row">
+
+                <label class="add-asset-label" for="formControlInput2">
+                    Artist &nbsp;
+                    <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                       title="The name of artist who created the artwork.">
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </label>
+                <input type="text" name="Artist" class="form-control" id="formControlInput2"
+                       placeholder="Leonardo da Vinci" readonly value="{{ catena_asset.artist }}">
+            </div>
+
+            <div class="form-row">
+
+                <label class="add-asset-label" for="formControlInput2">
+                    Username &nbsp;
+                    <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                       title="The username to send the artwork to.">
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </label>
+                <input type="text" name="Asset Owner" class="form-control" id="formControlInput2"
+                       placeholder="{{ user.public_key }}" required="">
+            </div>
+
+            <div class="form-row">
+
+                <label class="add-asset-label" for="formControlInput2">
+                    Asset Public Key Address &nbsp;
+                    <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                       title="The recipient address to send the artwork to.">
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </label>
+                <input type="text" name="Asset Public Key Address" class="form-control" id="formControlInput2"
+                       placeholder="{{ user.public_key }}" required="">
+            </div>
+
+            <div class="form-row">
+
+                <label class="add-asset-label">
+                    Notes &nbsp;
+                    <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                       title="Notes on the transfer.">
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </label>
+                <textarea type="text" name="Notes" class="form-control" id="formControlTextarea1"
+                          rows="3"></textarea>
+            </div>
+
+            <div class="form-row">
+                <input type="hidden" name="Price" class="form-control" value="{{ catena_asset.price }}">
+            </div>
+
+            <div class="form-row">
+                <input type="hidden" name="Description" class="form-control" value="{{ catena_asset.description }}">
+            </div>
+
+            <div class="form-row">
+                <input type="hidden" name="Public" class="form-control" value="off">
+            </div>
+
+            <div class="edit-asset-button-container justify-content-center">
+                <button type="submit" class="btn btn-primary">Transfer</button>
+            </div>
+
+
+        </form>
+        <div></div>
+    </div>
+
+{% endblock %}

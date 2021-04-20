@@ -25,7 +25,7 @@
             </div>
             <div class="bs-stepper-content">
 
-                <form class="container center_div needs-validation was-validated" id="add-asset-form" method="post"
+                <form class="container center_div needs-validation" id="add-asset-form" method="post"
                       novalidate=""
                       enctype="multipart/form-data">
                     {% csrf_token %}
@@ -35,7 +35,7 @@
 
                         <div class="form-row">
                             <label class="add-asset-label" for="formControlInput0">
-                                Asset Name &nbsp;
+                                Asset Name* &nbsp;
                                 <a class='catena-tooltip' href="#" data-toggle="tooltip"
                                    title="The name of the artwork.">
                                     <i class="fa fa-question-circle"></i>
@@ -50,7 +50,7 @@
                         <div class="form-row">
 
                             <label class="add-asset-label" for="formControlInput2">
-                                Artist &nbsp;
+                                Artist* &nbsp;
                                 <a class='catena-tooltip' href="#" data-toggle="tooltip"
                                    title="The name of artist who created the artwork.">
                                     <i class="fa fa-question-circle"></i>
@@ -63,7 +63,7 @@
                         <div class="form-row">
 
                             <label class="add-asset-label">
-                                Price &nbsp;
+                                Price* &nbsp;
                                 <a class='catena-tooltip' href="#" data-toggle="tooltip"
                                    title="The price of the artwork.">
                                     <i class="fa fa-question-circle"></i>
@@ -72,7 +72,7 @@
                             </label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">PAI</span>
                                 </div>
 
                                 <input id="input_price" type="text" name="Price" class="form-control"
@@ -85,8 +85,21 @@
 
                         <div class="form-row">
 
+                            <label class="add-asset-label" for="formControlInput2">
+                                Asset Public Key Address* &nbsp;
+                                <a class='catena-tooltip' href="#" data-toggle="tooltip"
+                                   title="The address to send paicoin to in order to pay for the artwork.">
+                                    <i class="fa fa-question-circle"></i>
+                                </a>
+                            </label>
+                            <input type="text" name="Asset Public Key Address" class="form-control" id="formControlInput2"
+                                   placeholder="{{ user.public_key }}" required="">
+                        </div>
+
+                        <div class="form-row">
+
                             <label class="add-asset-label">
-                                Description &nbsp;
+                                Description* &nbsp;
                                 <a class='catena-tooltip' href="#" data-toggle="tooltip"
                                    title="The description of the artwork.">
                                     <i class="fa fa-question-circle"></i>
@@ -95,14 +108,17 @@
                             <textarea type="text" name="Description" class="form-control" id="formControlTextarea1"
                                       rows="3"></textarea>
                         </div>
-
+{#                        Images#}
                         <div class="form-row">
                             <label class="add-asset-label">
-                                Images &nbsp;
+                                Images* &nbsp;
                                 <a class='catena-tooltip' href="#" data-toggle="tooltip"
                                    title="Images of the artwork.">
                                     <i class="fa fa-question-circle"></i>
                                 </a>
+                                <div class="invalid-feedback">
+                                    Please upload an image of the artwork
+                                </div>
 
                             </label>
                             <input type="file" name="Images" class="form-control-file" id="assetImgUploads" multiple>
@@ -123,6 +139,7 @@
                                 </label>
                             </div>
                         </div>
+                        * Required
                         <div class="add-asset-stepper-button-container">
                             <button class="btn btn-primary add-asset-prev-btn" type="button" disabled>Prev</button>
                             <button class="btn btn-primary add-asset-nxt-btn btn-next-form" type="button">Next</button>

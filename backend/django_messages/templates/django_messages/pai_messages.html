@@ -1,0 +1,11 @@
+{% extends "django_messages/base.html" %}
+{% load i18n %}
+
+{% block content %}
+    <div id="pai-messages-iframe-div"
+         class="pai-messages-iframe-div">
+    </div>
+    <input type="hidden" id="PAIPASS_URL" name="variable" value="{{ PAIPASS_URL }}">
+    {{ thread|json_script:"thread-data" }}
+    {{ application|json_script:"application-data" }}
+{% endblock %}
